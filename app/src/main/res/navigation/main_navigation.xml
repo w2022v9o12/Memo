@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/memoMainFragment">
+
+    <fragment
+        android:id="@+id/memoMainFragment"
+        android:name="w2022v9o12.memo.MemoMainFragment"
+        android:label="fragment_memo_main"
+        tools:layout="@layout/fragment_memo_main" >
+        <action
+            android:id="@+id/action_memoMainFragment_to_DDayFragment"
+            app:destination="@id/DDayFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/DDayFragment"
+        android:name="w2022v9o12.memo.DDayFragment"
+        android:label="fragment_d_day"
+        tools:layout="@layout/fragment_d_day" >
+        <action
+            android:id="@+id/action_DDayFragment_to_memoMainFragment"
+            app:destination="@id/memoMainFragment" />
+    </fragment>
+
+</navigation>

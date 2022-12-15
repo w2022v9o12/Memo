@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="360dp"
+    android:layout_height="360dp">
+
+    <TextView
+        android:id="@+id/memo_click_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFF99"
+        android:padding="3dp"
+        android:text="제목 영역"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/memo_click_content"
+        android:layout_width="match_parent"
+        android:layout_height="315dp"
+        android:layout_marginTop="5dp"
+        android:background="#FFFF99"
+        android:padding="5dp"
+        android:text="메모 영역"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/memo_click_title" />
+
+    <TextView
+        android:id="@+id/memo_click_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="작성 날짜 영역"
+        android:layout_marginLeft="5dp"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 저작권 표시 (Trash Can icon by Icons8) -->
+    <ImageView
+        android:id="@+id/memo_click_trash_can"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/trash_can_icon_by_icons8_01" />
+
+    <!-- 저작권 표시 (Write icon by Icons8) -->
+    <ImageView
+        android:id="@+id/memo_click_update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/memo_click_trash_can"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="5dp"
+        app:srcCompat="@drawable/write_icon_by_icons8_02" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

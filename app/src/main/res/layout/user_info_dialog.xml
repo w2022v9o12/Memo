@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingBottom="15dp"
+    android:paddingLeft="25dp"
+    android:paddingRight="25dp">
+
+    <TextView
+        android:id="@+id/uid_user_email_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:textColor="@color/black"
+        android:text="사용자 이메일 영역"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="15dp"/>
+
+    <TextView
+        android:id="@+id/uid_memo_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="메모 개수 영역"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@+id/uid_user_email_textView"
+        app:layout_constraintTop_toBottomOf="@+id/uid_user_email_textView" />
+
+    <TextView
+        android:id="@+id/uid_dday_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="D-Day 개수 영역"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@+id/uid_memo_count"
+        app:layout_constraintTop_toBottomOf="@+id/uid_memo_count" />
+
+    <TextView
+        android:id="@+id/uid_logout_textView"
+        android:textColor="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="로그아웃"
+        app:layout_constraintEnd_toEndOf="@+id/uid_user_email_textView"
+        app:layout_constraintTop_toBottomOf="@+id/uid_dday_count" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

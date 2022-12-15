@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:background="@drawable/rectangle_border_background"
+        android:id="@+id/main_linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingRight="10dp"
+        android:orientation="horizontal">
+
+        <!-- 저작권 표시 (User icon by Icons8) -->
+        <ImageView
+            android:id="@+id/main_user_imageView"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            app:srcCompat="@drawable/user_icon_by_icons8_02" />
+
+        <TextView
+            android:gravity="center"
+            android:textSize="50sp"
+            android:textColor="@color/white"
+            android:background="@color/black"
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Memo" />
+
+        <!-- 저작권 표시 (Writing icon by Icons8) -->
+        <ImageView
+            android:id="@+id/main_write_memo"
+            android:layout_marginLeft="10dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:srcCompat="@drawable/writing_icon_by_icons8_01" />
+
+        <!-- 저작권 표시 (Calendar icon by Icons8) -->
+        <ImageView
+            android:id="@+id/main_set_dDay"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            app:srcCompat="@drawable/calendar_icon_by_icons8_01" />
+
+    </LinearLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:background="@drawable/rectangle_border_background"
+        android:id="@+id/main_fragmentContainerView"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:navGraph = "@navigation/main_navigation"/>
+
+</LinearLayout>
