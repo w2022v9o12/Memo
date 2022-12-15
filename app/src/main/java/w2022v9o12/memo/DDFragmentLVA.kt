@@ -25,50 +25,51 @@ class DDFragmentLVA(val dataList: List<DDayDM>, val context: Context) : BaseAdap
         return dataList.size
     }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?) : View {
+        // 파이어베이스 준비
         auth = Firebase.auth
-
         val database = Firebase.database
-        val dDayRef = database.getReference("D-DayList").child(auth.currentUser!!.uid)
+        val dDayListRef = database.getReference("D-DayList").child(auth.currentUser!!.uid)
 
+        // 리스트 뷰 작업 시작
         var itemView = convertView
-        if(itemView == null) {
-            itemView = LayoutInflater.from(parent?.context).inflate(R.layout.ddf_lv_item, parent, false)
-        }
+        if(itemView == null) { itemView = LayoutInflater.from(parent?.context).inflate(R.layout.ddf_lv_item, parent, false) }
 
-        // D-Day 날짜 계산
+        // 아이템의 어떤 뷰가 어떤 데이터를 받을지 설정
+        // D-Day 날짜 미리 계산
         val startDate = Calendar.getInstance()
-        startDate.set(dataList[position].startDate[0], dataList[position].startDate[1], dataList[position].startDate[2])    // 년도, 월, 일
+        startDate.set(dataList[position].startDate[0], dataList[position].startDate[1], dataList[position].startDate[2])
         val endDate = Calendar.getInstance()
         endDate.set(dataList[position].endDate[0], dataList[position].endDate[1], dataList[position].endDate[2])
 
         val calcDateResult = TimeUnit.MILLISECONDS.toDays(endDate.timeInMillis - startDate.timeInMillis)
 
-        // 어떤 뷰가 어떤 데이터를 받을지 설정
-        // 제목
-        val title = itemView!!.findViewById<TextView>(R.id.ddf_lvi_textView)
-        title.text = "${dataList[position].title} ( D - ${calcDateResult} )"
+        // 아이템: D-Day 정보 표시
+        val dDayInfo = itemView?.findViewById<TextView>(R.id.ddf_lvi_textView)
+        dDayInfo?.text = "${dataList[position].title} ( D - ${calcDateResult} )"
 
-        // 수정 버튼 클릭
-        val editButton = itemView!!.findViewById<Button>(R.id.ddf_lvi_button)
-        editButton.setOnClickListener {
-            val cldDialogView = LayoutInflater.from(context).inflate(R.layout.calc_dday_dialog, null)
-            val cldDialog = AlertDialog.Builder(context).setView(cldDialogView)
-            val cldDialogShow = cldDialog.show()
+        // 수정 버튼
+        val editButton = itemView?.findViewById<Button>(R.id.ddf_lvi_button)
+        editButton?.setOnClickListener {
+            val cdDialogView = LayoutInflater.from(context).inflate(R.layout.calc_dday_dialog, null)
+            val cdDialog = AlertDialog.Builder(context).setView(cdDialogView)
+            val showingDialog = cdDialog.show()
 
-            val cldTitle = cldDialogShow.findViewById<EditText>(R.id.dday_dialog_title)
-            cldTitle?.setText(dataList[position].title)
-            val cldContent = cldDialogShow.findViewById<EditText>(R.id.dday_dialog_content)
-            cldContent?.setText(dataList[position].content)
-            val cldStartDateText = cldDialogShow.findViewById<TextView>(R.id.dday_dialog_startDate)
-            val cldEndDateText = cldDialogShow.findViewById<TextView>(R.id.dday_dialog_endDate)
+            val cdTitle = showingDialog.findViewById<EditText>(R.id.dday_dialog_title)
+            cdTitle?.setText(dataList[position].title)
+            val cdContent = showingDialog.findViewById<EditText>(R.id.dday_dialog_content)
+            cdContent?.setText(dataList[position].content)
+            val cdStartDateText = showingDialog.findViewById<TextView>(R.id.dday_dialog_startDate)
+            cdStartDateText?.text = "시작: ${dataList[position].startDate[0]}년 ${dataList[position].startDate[1] + 1}월 ${dataList[position].startDate[2]}일"
+            val cdEndDateText = showingDialog.findViewById<TextView>(R.id.dday_dialog_endDate)
+            cdEndDateText?.text = "종료: ${dataList[position].endDate[0]}년 ${dataList[position].endDate[1] + 1}월 ${dataList[position].endDate[2]}일"
 
             // 다이얼로그: 시작 날짜 버튼
             var sYear = 0
             var sMonth = 0
             var sDay = 0
 
-            val pickStartDate = cldDialogShow.findViewById<Button>(R.id.dday_dialog_sdBtn)
+            val pickStartDate = showingDialog.findViewById<Button>(R.id.dday_dialog_sdBtn)
             pickStartDate?.setOnClickListener {
                 val gCalendar = GregorianCalendar()
                 val nYear = gCalendar.get(Calendar.YEAR)
@@ -77,7 +78,7 @@ class DDFragmentLVA(val dataList: List<DDayDM>, val context: Context) : BaseAdap
 
                 val startDatePick = DatePickerDialog(context, object : DatePickerDialog.OnDateSetListener {
                     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-                        cldStartDateText?.setText("시작: ${year}년 ${month + 1}월 ${dayOfMonth}일")
+                        cdStartDateText?.setText("시작: ${year}년 ${month + 1}월 ${dayOfMonth}일")
                         sYear = year
                         sMonth = month
                         sDay = dayOfMonth
@@ -91,7 +92,7 @@ class DDFragmentLVA(val dataList: List<DDayDM>, val context: Context) : BaseAdap
             var eMonth = 0
             var eDay = 0
 
-            val pickEndDate = cldDialogShow.findViewById<Button>(R.id.dday_dialog_edBtn)
+            val pickEndDate = showingDialog.findViewById<Button>(R.id.dday_dialog_edBtn)
             pickEndDate?.setOnClickListener {
                 val gCalendar = GregorianCalendar()
                 val nYear = gCalendar.get(Calendar.YEAR)
@@ -100,7 +101,7 @@ class DDFragmentLVA(val dataList: List<DDayDM>, val context: Context) : BaseAdap
 
                 val endDatePick = DatePickerDialog(context, object : DatePickerDialog.OnDateSetListener {
                     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-                        cldEndDateText?.setText("시작: ${year}년 ${month + 1}월 ${dayOfMonth}일")
+                        cdEndDateText?.setText("종료: ${year}년 ${month + 1}월 ${dayOfMonth}일")
                         eYear = year
                         eMonth = month
                         eDay = dayOfMonth
@@ -109,15 +110,13 @@ class DDFragmentLVA(val dataList: List<DDayDM>, val context: Context) : BaseAdap
                 endDatePick.show()
             }
 
-            // 저장을 위한 사전 작업
+            // 저장하기 위한 사전 작업
             var key = ""
-            dDayRef.addValueEventListener(object : ValueEventListener{
+            dDayListRef.addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     var count = 0
                     for(setItem in snapshot.children){
-                        if(position == count) {
-                            key = setItem.key!!
-                        }
+                        if(count == position) { key = setItem.key!! }
                         count++
                     }
                 }
@@ -125,29 +124,29 @@ class DDFragmentLVA(val dataList: List<DDayDM>, val context: Context) : BaseAdap
                 override fun onCancelled(error: DatabaseError) {}
             })
 
-            // 다이얼로그: 저장 버튼 클릭
-            val cldSaveButton = cldDialogShow.findViewById<Button>(R.id.dday_dialog_saveBtn)
-            cldSaveButton?.setOnClickListener {
-                dDayRef.child(key).setValue(DDayDM(cldTitle?.text.toString(), cldContent?.text.toString(), arrayListOf<Int>(sYear, sMonth, sDay), arrayListOf<Int>(eYear, eMonth, eDay)))
+            // 다이얼로그: 저장 버튼
+            val cdSaveButton = showingDialog.findViewById<Button>(R.id.dday_dialog_saveBtn)
+            cdSaveButton?.setOnClickListener {
+                dDayListRef.child(key).setValue(DDayDM(cdTitle?.text.toString(), cdContent?.text.toString(), arrayListOf<Int>(sYear, sMonth, sDay), arrayListOf<Int>(eYear, eMonth, eDay)))
 
-                cldDialogShow.dismiss()
+                showingDialog.dismiss()
             }
 
-            // 다이얼로그: 취소 버튼 클릭
-            val cldCancelButton = cldDialogShow.findViewById<Button>(R.id.dday_dialog_cancelBtn)
-            cldCancelButton?.setOnClickListener { cldDialogShow.dismiss() }
+            // 다이얼로그: 취소 버튼
+            val cdCancelButton = showingDialog.findViewById<Button>(R.id.dday_dialog_cancelBtn)
+            cdCancelButton?.setOnClickListener { showingDialog.dismiss() }
 
-            // 다이얼로그: 삭제 버튼 클릭
-            val cldDeleteBtn = cldDialogShow.findViewById<ImageView>(R.id.dday_dialog_delete)
-            cldDeleteBtn?.visibility = View.VISIBLE
-            cldDeleteBtn?.setOnClickListener {
-                dDayRef.child(key).removeValue()
+            // 다이얼로그: 삭제 이미지 클릭
+            val cdDeleteBtn = showingDialog.findViewById<ImageView>(R.id.dday_dialog_delete)
+            cdDeleteBtn?.visibility = View.VISIBLE
+            cdDeleteBtn?.setOnClickListener {
+                dDayListRef.child(key).removeValue()
 
-                cldDialogShow.dismiss()
+                showingDialog.dismiss()
             }
         }
 
-        return itemView
+        return itemView!!
     }
 
     override fun getItem(position: Int): Any {

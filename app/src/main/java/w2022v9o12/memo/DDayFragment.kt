@@ -15,42 +15,42 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.database.ktx.getValue
 
 class DDayFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) : View? {
+        // 파이어베이스 준비
         auth = Firebase.auth
-
         val database = Firebase.database
-        val myRef = database.getReference("D-DayList").child(auth.currentUser!!.uid)
+        val dDayListRef = database.getReference("D-DayList").child(auth.currentUser!!.uid)
 
+        // 프래그먼트 작업 시작
         val fragmentView = inflater.inflate(R.layout.fragment_d_day, container, false)
 
         // ListView 작업
-        val dDayList = ArrayList<DDayDM>()    // D-Day 날짜 정보가 담길 리스트
+        val dDayList = ArrayList<DDayDM>()
         val listView = fragmentView.findViewById<ListView>(R.id.ddFragment_listView)
-        val lvAdapter = DDFragmentLVA(dDayList, requireContext())
-        listView.adapter = lvAdapter
+        val listViewAdapter = DDFragmentLVA(dDayList, requireContext())
 
-        myRef.addValueEventListener(object : ValueEventListener {
+        dDayListRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 dDayList.clear()
                 for(setItem in snapshot.children) {
                     dDayList.add(setItem.getValue(DDayDM::class.java)!!)
                 }
 
-                lvAdapter.notifyDataSetChanged()    // ListView 새로 고침 (이유: 비동기 처리)
+                // ListView 새로 고침 (이유: 비동기식 처리)
+                listViewAdapter.notifyDataSetChanged()
             }
 
             override fun onCancelled(error: DatabaseError) {}
         })
 
-        // 네비게이션을 이용한 이동 작업
+        listView.adapter = listViewAdapter
+
+        // 네비게이션을 통한 이동 작업
         val memoButton = fragmentView.findViewById<TextView>(R.id.ddFragment_memo_btn)
         memoButton.setOnClickListener { memoButton.findNavController().navigate(R.id.action_DDayFragment_to_memoMainFragment) }
 

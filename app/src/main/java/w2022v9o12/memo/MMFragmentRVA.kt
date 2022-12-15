@@ -28,13 +28,11 @@ class MMFragmentRVA(val memoDMList: List<MemoDM>) : RecyclerView.Adapter<MMFragm
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bindData(memoDMList[position])
 
-        // 메모 (아이템) 클릭
-        if(eventListener != null) {
-            holder.itemView.setOnClickListener { eventListener!!.itemClick(it, position) }
-        }
+        // 메모 (아이템) 클릭 이벤트 처리
+        if(eventListener != null) { holder.itemView.setOnClickListener { eventListener?.itemClick(it, position) } }
     }
 
-    // 이벤트 사전 작업
+    // 이벤트 처리를 위한 사전 작업
     interface ItemClickListener {
         fun itemClick(itemView: View, position: Int)
     }

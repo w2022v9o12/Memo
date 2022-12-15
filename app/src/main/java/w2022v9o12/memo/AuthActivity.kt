@@ -26,11 +26,21 @@ class AuthActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
 
+        // 파이어베이스 준비
         auth = Firebase.auth
-
         val database = Firebase.database
-        val myRef = database.getReference("EmailList")
-        val countRef = database.getReference("Count")    // 사용자의 메모, D-Day 사용 횟수
+        val emailListRef = database.getReference("EmailList")
+        val countRef = database.getReference("Count")
+
+        // 이미 가입되어 있는 이메일 가져오기
+        val emailArrayList = ArrayList<String>()
+        emailListRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for(setItem in snapshot.children) { emailArrayList.add(setItem.value.toString()) }
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
 
         // 로그인 버튼
         val loginButton = findViewById<Button>(R.id.auth_login_button)
@@ -38,129 +48,108 @@ class AuthActivity : AppCompatActivity() {
             val email = findViewById<EditText>(R.id.auth_email_editText).text.toString()
             val password = findViewById<EditText>(R.id.auth_password_editText).text.toString()
 
-            if(email == "") {
+            // 로그인 오류 띄워주기
+            if(email.isEmpty()) {
                 Toast.makeText(this, "이메일을 입력해 주세요.", Toast.LENGTH_SHORT).show()
-            } else if(password == "") {
+            }
+
+            else if(password.isEmpty()) {
                 Toast.makeText(this, "비밀번호를 입력해 주세요.", Toast.LENGTH_SHORT).show()
-            } else {
+            }
+
+            // 로그인 시도
+            else {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if(task.isSuccessful) {
                             startActivity(Intent(this, MainActivity::class.java))
                             finish()
                         } else {
-                            Toast.makeText(this, "로그인 할 수 없습니다.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "비밀번호가 틀렸습니다.", Toast.LENGTH_SHORT).show()
                         }
                     }
             }
         }
 
-        // 회원가입 되어있는 이메일들 가져오기
-        val emailArrayList = arrayListOf<String>()
-        myRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for(setItem in snapshot.children) {
-                    emailArrayList.add(setItem.value.toString())
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {}
-        })
-
-        // 회원가입 클릭 (회원가입 다이얼로그 실행)
+        // 회원가입 버튼 (회원가입 다이얼로그 실행)
         val authSignUpTextView = findViewById<TextView>(R.id.auth_signUp_textView)
         authSignUpTextView.setOnClickListener {
             val signUpDialogView = LayoutInflater.from(this).inflate(R.layout.sign_up_dialog, null)
             val signUpDialog = AlertDialog.Builder(this).setView(signUpDialogView)
             val showingDialog = signUpDialog.show()
 
-            // 이메일, 비밀번호 입력 후 확인 버튼 클릭
+            // 회원가입 다이얼로그: 확인 버튼
             val confirmButton = showingDialog.findViewById<Button>(R.id.signUp_dialog_confirm_button)
-            confirmButton!!.setOnClickListener {
-                val emailEditText = showingDialog.findViewById<EditText>(R.id.signUp_dialog_email_editText)
-                val passwordEditText = showingDialog.findViewById<EditText>(R.id.signUp_dialog_password_editText)
+            confirmButton?.setOnClickListener {
+                val email = showingDialog.findViewById<EditText>(R.id.signUp_dialog_email_editText)?.text.toString()
+                val password = showingDialog.findViewById<EditText>(R.id.signUp_dialog_password_editText)?.text.toString()
 
-                // 이메일과 비밀번호가 알맞게 입력 되었는지 알 수 있도록 해주는 변수
-                var allRight = false
-
-                // 이메일 검사
-                // 이메일 부분이 비어있을 때
-                if(emailEditText!!.text.toString() == "") {
+                var allRight = true    // 입력한 이메일, 비밀번호 검사 결과
+                if(email.isEmpty()) {
                     Toast.makeText(this, "이메일을 입력해야 합니다.", Toast.LENGTH_SHORT).show()
-                } else {
-                    allRight = true
+
+                    allRight = false
                 }
 
-                // 이메일의 특수문자와 관련된 검사
-                if(emailEditText!!.text.toString() != "") {
-                    val emailValue = emailEditText!!.text.toString()
+                // 이메일 특수문자 검사
+                if(!email.isEmpty()) {
+                    // 이메일 형식에 맞지 않는 특수문자 검사
                     val prohibitionList = listOf<String>(
                         "`", "~", "!", "#", "$", "%", "^", "&", "*", "(",
                         ")", "-", "_", "=", "+", "[", "{", "]", "}", ";",
                         ":", ",", "<", ">", "/", "?", "|",
                         "\'", "\"", "\\"
                     )
-
-                    // 이메일 형식에 맞지 않는 특수문자가 들어 있는지 검사
                     for(item in prohibitionList) {
-                        if(emailValue.indexOf(item) != -1) {
-                            allRight = false
-                        }
+                        if(email.indexOf(item) != -1) { allRight = false }
                     }
 
-                    // 특수문자 @와 .의 유무 및 여러번 쓰였는지 검사
-                    if(emailValue.count { it == '@' } < 1 || 1 < emailValue.count { it == '@' }) {
+                    // @, . 검사
+                    if(email.count { it == '@' } < 1 || 1 < email.count { it == '@' }) {
                         allRight = false
-                    } else if(emailValue.count { it == '.' } < 1 || 1 < emailValue.count { it == '.' }) {
+                    } else if(email.count { it == '.' } < 1 || 1 < email.count { it == '.' }) {
                         allRight = false
                     }
+                    if(email.indexOf('@') > email.indexOf('.')) { allRight = false }
+                    if(email.indexOf('@') == 0 || email.indexOf('@') - email.indexOf('.') == -1 || email.indexOf('.') == email.lastIndex) { allRight = false }
 
-                    if(allRight == false) {
-                        Toast.makeText(this, "옳바른 이메일 형식으로 기입해 주세요.", Toast.LENGTH_SHORT).show()
-                    }
+                    if(!allRight) { Toast.makeText(this, "옳바른 이메일 형식으로 입력해 주세요.", Toast.LENGTH_SHORT).show() }
                 }
 
-                // 이메일 중복 여부 검사 (이미 회원가입 되어있는 이메일인지 검사)
-                if(emailEditText!!.text.toString() != "") {
-                    val emailValue = emailEditText!!.text.toString()
-
-                    var check = false
-
-                    for(email in emailArrayList) {
-                        if(emailValue == email) {
-                            check = true
-                        }
+                // 이미 회원가입 되어있는 이메일인지 검사
+                if(!email.isEmpty()) {
+                    for(item in emailArrayList) {
+                        if(email == item) { allRight = false }
                     }
 
-                    if(check) {
-                        allRight = false
-                        Toast.makeText(this, "이미 가입 되어있는 이메일입니다.", Toast.LENGTH_SHORT).show()
-                    }
+                    if(!allRight) { Toast.makeText(this, "이미 가입 되어있는 이메일입니다.", Toast.LENGTH_SHORT).show() }
                 }
 
                 // 비밀번호 검사
-                // 비밀번호 부분이 비어있을 때
-                if(passwordEditText!!.text.toString() == "") {
-                    allRight = false
+                if(password.isEmpty()) {
                     Toast.makeText(this, "비밀번호를 입력해야 합니다.", Toast.LENGTH_SHORT).show()
-                }
-                // Firebase 비밀번호 조건에 부합되는지 검사 (6자리 이상)
-                else if(passwordEditText!!.text.toString().length < 6) {
+
                     allRight = false
-                    Toast.makeText(this, "비밀번호는 6자리 이상이어야 합니다.", Toast.LENGTH_SHORT).show()
                 }
 
-                // 회원가입 성공
+                // 파이어베이스 비밀번호 조건에 부합되는지 검사 (6자리 이상)
+                else if(password.length < 6) {
+                    Toast.makeText(this, "비밀번호는 6자리 이상이어야 합니다.", Toast.LENGTH_SHORT).show()
+
+                    allRight = false
+                }
+
+                // 회원가입 시도
                 if(allRight) {
-                    auth.createUserWithEmailAndPassword(emailEditText!!.text.toString(), passwordEditText!!.text.toString())
+                    auth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(this) { task ->
                             if(task.isSuccessful) {
-                                // Firebase Realtime Database에 이메일 추가, 사용 횟수 작업
-                                myRef.push().setValue(emailEditText!!.text.toString())
+                                // 파이어베이스 작업
+                                emailListRef.push().setValue(email)
                                 countRef.child(auth.currentUser!!.uid).child("MemoCount").setValue(0)
                                 countRef.child(auth.currentUser!!.uid).child("D-DayCount").setValue(0)
 
-                                // 회원가입 다이얼로그 종료 및 자동 로그인 처리
+                                // 액티비티 작업
                                 showingDialog.dismiss()
                                 startActivity(Intent(this, MainActivity::class.java))
                                 finish()
@@ -171,17 +160,16 @@ class AuthActivity : AppCompatActivity() {
         }
     }
 
-    var isExit = false
+    // 뒤로가기 버튼 두 번 눌러야 종료되도록 작업
+    private var isExit = false
     override fun onBackPressed() {
-        if(isExit) {
-            finish()
-        } else {
-            isExit = true
+        if(!isExit) {
             Toast.makeText(this, "한 번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show()
 
-            Handler().postDelayed({
-                isExit = false
-            }, 1500)
+            isExit = true
+            Handler().postDelayed({ isExit = false }, 1500)
+        } else {
+            finish()
         }
     }
 }

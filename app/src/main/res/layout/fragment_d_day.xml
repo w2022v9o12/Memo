@@ -8,11 +8,10 @@
     tools:context=".DDayFragment">
 
     <ListView
-        android:layout_gravity="top"
         android:id="@+id/ddFragment_listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="50dp"/>
+        android:paddingBottom="52dp"/>
 
     <LinearLayout
         android:layout_gravity="bottom"

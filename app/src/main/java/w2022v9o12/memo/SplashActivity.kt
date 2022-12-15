@@ -15,9 +15,10 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+        // 파이어베이스 준비
         auth = Firebase.auth
 
-        // 인증 확인 후 다른 액티비티 실행
+        // 인증 확인 후 상황에 맞는 액티비티 실행
         Handler().postDelayed({
             if(auth.currentUser?.uid == null) {
                 startActivity(Intent(this, AuthActivity::class.java))

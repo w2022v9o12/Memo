@@ -2,7 +2,7 @@
 
 buildscript {
     dependencies {
-        // Firebase
+        // 파이어베이스
         classpath 'com.google.gms:google-services:4.3.13'
     }
 }

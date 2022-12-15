@@ -17,7 +17,6 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.database.ktx.getValue
-import org.w3c.dom.Text
 import java.util.Calendar
 import java.util.GregorianCalendar
 
@@ -28,14 +27,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // 파이어베이스 준비
         auth = Firebase.auth
-
         val database = Firebase.database
-        val myRef = database.getReference("MemoList").child(auth.currentUser!!.uid)
-        val dDayRef = database.getReference("D-DayList").child(auth.currentUser!!.uid)
+        val memoListRef = database.getReference("MemoList").child(auth.currentUser!!.uid)
+        val dDayListRef = database.getReference("D-DayList").child(auth.currentUser!!.uid)
         val countRef = database.getReference("Count").child(auth.currentUser!!.uid)
 
-        // 사용 횟수 가져오기
+        // 제작 횟수 정보 가져오기
         var memoCount = 0
         var dDayCount = 0
         countRef.child("MemoCount").addValueEventListener(object : ValueEventListener {
@@ -53,81 +52,83 @@ class MainActivity : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError) {}
         })
 
-        // User 아이콘 클릭
+        // 유저 아이콘 클릭
         val userButton = findViewById<ImageView>(R.id.main_user_imageView)
         userButton.setOnClickListener {
             val uiDialogView = LayoutInflater.from(this).inflate(R.layout.user_info_dialog, null)
             val uiDialog = AlertDialog.Builder(this).setView(uiDialogView)
-            val uiDialogShow = uiDialog.show()
+            val showingDialog = uiDialog.show()
 
-            // User 아이콘 다이얼로그: 가입한 이메일 가져오기
-            val uidUserEmail = uiDialogShow.findViewById<TextView>(R.id.uid_user_email_textView)
-            uidUserEmail!!.text = auth.currentUser?.email!!
+            // 다이얼로그: 가입한 이메일 표시
+            val uidUserEmail = showingDialog.findViewById<TextView>(R.id.uid_user_email_textView)
+            uidUserEmail?.text = auth.currentUser?.email
 
-            // User 아이콘 다이얼로그: 메모 개수, D-Day 개수
-            val uidMemoCount = uiDialogShow.findViewById<TextView>(R.id.uid_memo_count)
+            // 다이얼로그: 메모 개수, D-Day 개수
+            val uidMemoCount = showingDialog.findViewById<TextView>(R.id.uid_memo_count)
             uidMemoCount?.text = "⊙ 메모 ${memoCount}번 사용"
-            val uidDDayCount = uiDialogShow.findViewById<TextView>(R.id.uid_dday_count)
+            val uidDDayCount = showingDialog.findViewById<TextView>(R.id.uid_dday_count)
             uidDDayCount?.text = "⊙ D-Day ${dDayCount}번 사용"
 
-            // User 아이콘 다이얼로그: 로그아웃 클릭
-            val uidLogoutButton = uiDialogShow.findViewById<TextView>(R.id.uid_logout_textView)
-            uidLogoutButton!!.setOnClickListener {
+            // 다이얼로그: 로그아웃
+            val uidLogoutButton = showingDialog.findViewById<TextView>(R.id.uid_logout_textView)
+            uidLogoutButton?.setOnClickListener {
                 Firebase.auth.signOut()
+
                 startActivity(Intent(this, AuthActivity::class.java))
                 finish()
             }
         }
 
-        // Writing 아이콘 클릭
+        // 메모 작성 아이콘 클릭
         val writeMemoButton = findViewById<ImageView>(R.id.main_write_memo)
         writeMemoButton.setOnClickListener {
             val wmDialogView = LayoutInflater.from(this).inflate(R.layout.write_memo_dialog, null)
             val wmDialog = AlertDialog.Builder(this).setView(wmDialogView)
-            val wmDialogShow = wmDialog.show()
+            val showingDialog = wmDialog.show()
 
-            // Writing 아이콘 다이얼로그: 저장 버튼 클릭
-            val wmdSaveButton = wmDialogShow.findViewById<Button>(R.id.wmd_save_button)
-            wmdSaveButton!!.setOnClickListener {
-                val title = wmDialogShow.findViewById<EditText>(R.id.wmd_title_editText)!!.text.toString()
-                val content = wmDialogShow.findViewById<EditText>(R.id.wmd_content_editText)!!.text.toString()
+            // 다이얼로그: 저장 버튼
+            val wmdSaveButton = showingDialog.findViewById<Button>(R.id.wmd_save_button)
+            wmdSaveButton?.setOnClickListener {
+                val title = showingDialog.findViewById<EditText>(R.id.wmd_title_editText)?.text.toString()
+                val content = showingDialog.findViewById<EditText>(R.id.wmd_content_editText)?.text.toString()
 
-                // 저장한 날짜
+                // 저장 버튼 클릭한 날짜
                 val calendar = GregorianCalendar()
                 val year = calendar.get(Calendar.YEAR)
                 val month = calendar.get(Calendar.MONTH) + 1
                 val day = calendar.get(Calendar.DATE)
                 val hour = calendar.get(Calendar.HOUR)
 
-                myRef.push().setValue(MemoDM(title, content, "${year}년 ${month}월 ${day}일 ${hour}시"))
-                countRef.child("MemoCount").setValue(memoCount + 1)    // 메모 사용 횟수 작업
+                // 메모 저장
+                memoListRef.push().setValue(MemoDM(title, content, "${year}년 ${month}월 ${day}일 ${hour}시"))
+                countRef.child("MemoCount").setValue(memoCount + 1)
 
-                wmDialogShow.dismiss()
+                showingDialog.dismiss()
             }
 
-            // Writing 아이콘 다이얼로그: 취소 버튼 클릭
-            val wmdCancelButton = wmDialogShow.findViewById<Button>(R.id.wmd_cancel_button)
-            wmdCancelButton!!.setOnClickListener { wmDialogShow.dismiss() }
+            // 다이얼로그: 취소 버튼
+            val wmdCancelButton = showingDialog.findViewById<Button>(R.id.wmd_cancel_button)
+            wmdCancelButton?.setOnClickListener { showingDialog.dismiss() }
         }
 
-        // Calendar 아이콘 클릭
+        // D-Day 작성 아이콘 클릭
         val setDDayButton = findViewById<ImageView>(R.id.main_set_dDay)
         setDDayButton.setOnClickListener {
-            val cldDialogView = LayoutInflater.from(this).inflate(R.layout.calc_dday_dialog, null)
-            val cldDialog = AlertDialog.Builder(this).setView(cldDialogView)
-            val cldDialogShow = cldDialog.show()
+            val cdDialogView = LayoutInflater.from(this).inflate(R.layout.calc_dday_dialog, null)
+            val cdDialog = AlertDialog.Builder(this).setView(cdDialogView)
+            val showingDialog = cdDialog.show()
 
-            val cldTitle = cldDialogShow.findViewById<EditText>(R.id.dday_dialog_title)
-            val cldContent = cldDialogShow.findViewById<EditText>(R.id.dday_dialog_content)
-            val cldStartDateText = cldDialogShow.findViewById<TextView>(R.id.dday_dialog_startDate)
-            val cldEndDateText = cldDialogShow.findViewById<TextView>(R.id.dday_dialog_endDate)
+            val cdTitle = showingDialog.findViewById<EditText>(R.id.dday_dialog_title)
+            val cdContent = showingDialog.findViewById<EditText>(R.id.dday_dialog_content)
+            val cdStartDateText = showingDialog.findViewById<TextView>(R.id.dday_dialog_startDate)
+            val cdEndDateText = showingDialog.findViewById<TextView>(R.id.dday_dialog_endDate)
 
-            // Calendar 아이콘 다이얼로그: 시작 날짜 버튼
+            // 다이얼로그: 시작 날짜 버튼
             var sYear = 0
             var sMonth = 0
             var sDay = 0
 
-            val pickStartDate = cldDialogShow.findViewById<Button>(R.id.dday_dialog_sdBtn)
+            val pickStartDate = showingDialog.findViewById<Button>(R.id.dday_dialog_sdBtn)
             pickStartDate?.setOnClickListener {
                 val gCalendar = GregorianCalendar()
                 val nYear = gCalendar.get(Calendar.YEAR)
@@ -136,7 +137,7 @@ class MainActivity : AppCompatActivity() {
 
                 val startDatePick = DatePickerDialog(this, object : OnDateSetListener{
                     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-                        cldStartDateText?.setText("시작: ${year}년 ${month + 1}월 ${dayOfMonth}일")
+                        cdStartDateText?.setText("시작: ${year}년 ${month + 1}월 ${dayOfMonth}일")
                         sYear = year
                         sMonth = month
                         sDay = dayOfMonth
@@ -145,12 +146,12 @@ class MainActivity : AppCompatActivity() {
                 startDatePick.show()
             }
 
-            // Calendar 아이콘 다이얼로그: 종료 날짜 버튼
+            // 다이얼로그: 종료 날짜 버튼
             var eYear = 0
             var eMonth = 0
             var eDay = 0
 
-            val pickEndDate = cldDialogShow.findViewById<Button>(R.id.dday_dialog_edBtn)
+            val pickEndDate = showingDialog.findViewById<Button>(R.id.dday_dialog_edBtn)
             pickEndDate?.setOnClickListener {
                 val gCalendar = GregorianCalendar()
                 val nYear = gCalendar.get(Calendar.YEAR)
@@ -159,7 +160,7 @@ class MainActivity : AppCompatActivity() {
 
                 val endDatePick = DatePickerDialog(this, object : OnDateSetListener{
                     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-                        cldEndDateText?.setText("시작: ${year}년 ${month + 1}월 ${dayOfMonth}일")
+                        cdEndDateText?.setText("종료: ${year}년 ${month + 1}월 ${dayOfMonth}일")
                         eYear = year
                         eMonth = month
                         eDay = dayOfMonth
@@ -168,32 +169,31 @@ class MainActivity : AppCompatActivity() {
                 endDatePick.show()
             }
 
-            // Calendar 아이콘 다이얼로그: 저장 버튼 클릭
-            val cldSaveButton = cldDialogShow.findViewById<Button>(R.id.dday_dialog_saveBtn)
-            cldSaveButton?.setOnClickListener {
-                dDayRef.push().setValue(DDayDM(cldTitle?.text.toString(), cldContent?.text.toString(), arrayListOf<Int>(sYear, sMonth, sDay), arrayListOf<Int>(eYear, eMonth, eDay)))
-                countRef.child("D-DayCount").setValue(dDayCount + 1)    // D-Day 사용 횟수 작업
+            // 다이얼로그: 저장 버튼
+            val cdSaveButton = showingDialog.findViewById<Button>(R.id.dday_dialog_saveBtn)
+            cdSaveButton?.setOnClickListener {
+                dDayListRef.push().setValue(DDayDM(cdTitle?.text.toString(), cdContent?.text.toString(), arrayListOf<Int>(sYear, sMonth, sDay), arrayListOf<Int>(eYear, eMonth, eDay)))
+                countRef.child("D-DayCount").setValue(dDayCount + 1)
 
-                cldDialogShow.dismiss()
+                showingDialog.dismiss()
             }
 
-            // Calendar 아이콘 다이얼로그: 취소 버튼 클릭
-            val cldCancelButton = cldDialogShow.findViewById<Button>(R.id.dday_dialog_cancelBtn)
-            cldCancelButton?.setOnClickListener { cldDialogShow.dismiss() }
+            // 다이얼로그: 취소 버튼
+            val cdCancelButton = showingDialog.findViewById<Button>(R.id.dday_dialog_cancelBtn)
+            cdCancelButton?.setOnClickListener { showingDialog.dismiss() }
         }
     }
 
-    var isExit = false
+    // 뒤로가기 버튼 두 번 눌러야 종료되도록 작업
+    private var isExit = false
     override fun onBackPressed() {
-        if(isExit) {
-            finish()
-        } else {
-            isExit = true
+        if(!isExit) {
             Toast.makeText(this, "한 번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show()
 
-            Handler().postDelayed({
-                isExit = false
-            }, 1500)
+            isExit = true
+            Handler().postDelayed({ isExit = false }, 1500)
+        } else {
+            finish()
         }
     }
 }

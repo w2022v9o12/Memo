@@ -8,12 +8,11 @@
     tools:context=".MemoMainFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_gravity="top"
         android:id="@+id/mmFragment_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="10dp"
-        android:paddingBottom="50dp"/>
+        android:paddingBottom="52dp"/>
 
     <LinearLayout
         android:layout_gravity="bottom"

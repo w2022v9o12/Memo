@@ -19,8 +19,6 @@
         android:inputType="textPersonName"
         android:hint="제목"
         android:background="@drawable/rectangle_border_background"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
@@ -37,8 +35,6 @@
         android:paddingTop="10dp"
         android:background="@drawable/rectangle_border_background"
         android:hint="메모"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dday_dialog_title" />
 
     <TextView
