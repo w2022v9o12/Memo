@@ -88,15 +88,21 @@ class MainActivity : AppCompatActivity() {
                     .setMessage("진행하시겠습니까?")
                     .setPositiveButton("네", object : DialogInterface.OnClickListener {
                         override fun onClick(dialog: DialogInterface?, which: Int) {
-                            auth.currentUser?.delete()
-                            emailListRef.removeValue()
-                            memoListRef.removeValue()
-                            dDayListRef.removeValue()
-                            countRef.removeValue()
+                            val currentUser = auth.currentUser
 
-                            showingDialog.dismiss()
-                            startActivity(Intent(baseContext, AuthActivity::class.java))
-                            finish()
+                            Firebase.auth.signOut()
+                            currentUser?.delete()?.addOnCompleteListener { task ->
+                                if(task.isSuccessful) {
+                                    emailListRef.removeValue()
+                                    memoListRef.removeValue()
+                                    dDayListRef.removeValue()
+                                    countRef.removeValue()
+
+                                    showingDialog.dismiss()
+                                    finishAffinity()
+                                    startActivity(Intent(baseContext, AuthActivity::class.java))
+                                }
+                            }
                         }
                     })
                     .setNegativeButton("아니오", null)

@@ -1,5 +1,6 @@
 package w2022v9o12.memo
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,10 @@ class MMFragmentRVA(val memoDMList: List<MemoDM>) : RecyclerView.Adapter<MMFragm
 
         fun bindData(memoDM: MemoDM) {
             titleTextView.text = memoDM.title
+            titleTextView.setBackgroundColor(Color.parseColor(memoDM.color))
+
             contentTextView.text = memoDM.content
+            contentTextView.setBackgroundColor(Color.parseColor(memoDM.color))
         }
     }
 

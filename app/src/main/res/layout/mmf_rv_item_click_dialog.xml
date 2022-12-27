@@ -61,4 +61,15 @@
         android:layout_marginBottom="5dp"
         app:srcCompat="@drawable/write_icon_by_icons8_02" />
 
+    <!-- 저작권 표시 (Palette icon by Icons8) -->
+    <ImageView
+        android:id="@+id/palette"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/palette_icon_by_icons8_01"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/memo_click_update" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package w2022v9o12.memo
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -67,9 +68,11 @@ class MemoMainFragment : Fragment() {
 
                         val titleTextView = showingDialog.findViewById<TextView>(R.id.memo_click_title)
                         titleTextView?.text = memoDMList[position].title
+                        titleTextView?.setBackgroundColor(Color.parseColor(memoDMList[position].color))
 
                         val contentTextView = showingDialog.findViewById<TextView>(R.id.memo_click_content)
                         contentTextView?.text = memoDMList[position].content
+                        contentTextView?.setBackgroundColor(Color.parseColor(memoDMList[position].color))
 
                         val dateTextView = showingDialog.findViewById<TextView>(R.id.memo_click_date)
                         dateTextView?.text = memoDMList[position].date
@@ -117,6 +120,21 @@ class MemoMainFragment : Fragment() {
                             // 취소 버튼
                             val cancelButton = showingUpdateMemo.findViewById<Button>(R.id.wmd_cancel_button)
                             cancelButton?.setOnClickListener { showingUpdateMemo.dismiss() }
+                        }
+
+                        // 색깔 변경 아이콘 클릭
+                        val paletteBtn = showingDialog.findViewById<ImageView>(R.id.palette)
+                        paletteBtn?.setOnClickListener {
+                            when(memoDMList[position].color) {
+                                "#FFFF99" -> memoDMList[position].color = "#7FFFD4"
+                                "#7FFFD4" -> memoDMList[position].color = "#007FFF"
+                                "#007FFF" -> memoDMList[position].color = "#FE6F5E"
+                                "#FE6F5E" -> memoDMList[position].color = "#FFFF99"
+                            }
+                            memoListRef.child(keyList[position]).setValue(memoDMList[position])
+
+                            titleTextView?.setBackgroundColor(Color.parseColor(memoDMList[position].color))
+                            contentTextView?.setBackgroundColor(Color.parseColor(memoDMList[position].color))
                         }
                     }
                 }
