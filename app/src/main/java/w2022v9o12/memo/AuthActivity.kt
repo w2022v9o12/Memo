@@ -48,24 +48,63 @@ class AuthActivity : AppCompatActivity() {
             val email = findViewById<EditText>(R.id.auth_email_editText).text.toString()
             val password = findViewById<EditText>(R.id.auth_password_editText).text.toString()
 
-            // 로그인 오류 띄워주기
+            // 검사 및 로그인 오류 띄워주기
+            var allRight = true
+
             if(email.isEmpty()) {
                 Toast.makeText(this, "이메일을 입력해 주세요.", Toast.LENGTH_SHORT).show()
+
+                allRight = false
             }
 
-            else if(password.isEmpty()) {
+            // 이메일 특수문자 검사
+            if(!email.isEmpty()) {
+                // 이메일 형식에 맞지 않는 특수문자 검사
+                val prohibitionList = listOf<String>(
+                    "`", "~", "!", "#", "$", "%", "^", "&", "*", "(",
+                    ")", "-", "_", "=", "+", "[", "{", "]", "}", ";",
+                    ":", ",", "<", ">", "/", "?", "|",
+                    "\'", "\"", "\\"
+                )
+                for(item in prohibitionList) {
+                    if(email.indexOf(item) != -1) { allRight = false }
+                }
+
+                // @, . 검사
+                if(email.count { it == '@' } < 1 || 1 < email.count { it == '@' }) {
+                    allRight = false
+                } else if(email.count { it == '.' } < 1 || 1 < email.count { it == '.' }) {
+                    allRight = false
+                }
+                if(email.indexOf('@') > email.indexOf('.')) { allRight = false }
+                if(email.indexOf('@') == 0 || email.indexOf('@') - email.indexOf('.') == -1 || email.indexOf('.') == email.lastIndex) { allRight = false }
+
+                if(!allRight) { Toast.makeText(this, "옳바른 이메일 형식으로 입력해 주세요.", Toast.LENGTH_SHORT).show() }
+            }
+
+            // 비밀번호 검사
+            if(password.isEmpty()) {
                 Toast.makeText(this, "비밀번호를 입력해 주세요.", Toast.LENGTH_SHORT).show()
+
+                allRight = false
+            }
+
+            // 파이어베이스 비밀번호 조건에 부합되는지 검사 (6자리 이상)
+            else if(password.length < 6) {
+                Toast.makeText(this, "비밀번호는 6자리 이상이어야 합니다.", Toast.LENGTH_SHORT).show()
+
+                allRight = false
             }
 
             // 로그인 시도
-            else {
+            if(allRight) {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if(task.isSuccessful) {
                             startActivity(Intent(this, MainActivity::class.java))
                             finish()
                         } else {
-                            Toast.makeText(this, "비밀번호가 틀렸습니다.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "이메일 혹은 비밀번호가 틀렸습니다.", Toast.LENGTH_SHORT).show()
                         }
                     }
             }
@@ -145,7 +184,7 @@ class AuthActivity : AppCompatActivity() {
                         .addOnCompleteListener(this) { task ->
                             if(task.isSuccessful) {
                                 // 파이어베이스 작업
-                                emailListRef.push().setValue(email)
+                                emailListRef.child(auth.currentUser!!.uid).setValue(email)
                                 countRef.child(auth.currentUser!!.uid).child("MemoCount").setValue(0)
                                 countRef.child(auth.currentUser!!.uid).child("D-DayCount").setValue(0)
 

@@ -2,6 +2,7 @@ package w2022v9o12.memo
 
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         // 파이어베이스 준비
         auth = Firebase.auth
         val database = Firebase.database
+        val emailListRef = database.getReference("EmailList").child(auth.currentUser!!.uid)
         val memoListRef = database.getReference("MemoList").child(auth.currentUser!!.uid)
         val dDayListRef = database.getReference("D-DayList").child(auth.currentUser!!.uid)
         val countRef = database.getReference("Count").child(auth.currentUser!!.uid)
@@ -76,6 +78,30 @@ class MainActivity : AppCompatActivity() {
 
                 startActivity(Intent(this, AuthActivity::class.java))
                 finish()
+            }
+
+            // 다이얼로그: 회원 탈퇴
+            val withdrawalBtn = showingDialog.findViewById<TextView>(R.id.withdrawal)
+            withdrawalBtn?.setOnClickListener {
+                AlertDialog.Builder(this)
+                    .setTitle("[ 회원 탈퇴 ]")
+                    .setMessage("진행하시겠습니까?")
+                    .setPositiveButton("네", object : DialogInterface.OnClickListener {
+                        override fun onClick(dialog: DialogInterface?, which: Int) {
+                            auth.currentUser?.delete()
+                            emailListRef.removeValue()
+                            memoListRef.removeValue()
+                            dDayListRef.removeValue()
+                            countRef.removeValue()
+
+                            showingDialog.dismiss()
+                            startActivity(Intent(baseContext, AuthActivity::class.java))
+                            finish()
+                        }
+                    })
+                    .setNegativeButton("아니오", null)
+                    .create()
+                    .show()
             }
         }
 
