@@ -77,6 +77,10 @@ class MemoMainFragment : Fragment() {
                         val dateTextView = showingDialog.findViewById<TextView>(R.id.memo_click_date)
                         dateTextView?.text = memoDMList[position].date
 
+                        // X 버튼
+                        val dismissBtn = showingDialog.findViewById<TextView>(R.id.dismiss)
+                        dismissBtn?.setOnClickListener { showingDialog.dismiss() }
+
                         // 휴지통 (삭제) 아이콘 클릭
                         val trashCanIcon = showingDialog.findViewById<ImageView>(R.id.memo_click_trash_can)
                         trashCanIcon?.setOnClickListener {

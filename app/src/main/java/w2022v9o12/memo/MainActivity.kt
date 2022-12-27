@@ -61,6 +61,10 @@ class MainActivity : AppCompatActivity() {
             val uiDialog = AlertDialog.Builder(this).setView(uiDialogView)
             val showingDialog = uiDialog.show()
 
+            // 다이얼로그: X 버튼
+            val dismissBtn = showingDialog.findViewById<TextView>(R.id.dismiss)
+            dismissBtn?.setOnClickListener { showingDialog.dismiss() }
+
             // 다이얼로그: 가입한 이메일 표시
             val uidUserEmail = showingDialog.findViewById<TextView>(R.id.uid_user_email_textView)
             uidUserEmail?.text = auth.currentUser?.email
@@ -155,18 +159,18 @@ class MainActivity : AppCompatActivity() {
             val cdStartDateText = showingDialog.findViewById<TextView>(R.id.dday_dialog_startDate)
             val cdEndDateText = showingDialog.findViewById<TextView>(R.id.dday_dialog_endDate)
 
+            val calendar = GregorianCalendar()
+            val nYear = calendar.get(Calendar.YEAR)
+            val nMonth = calendar.get(Calendar.MONTH)
+            val nDay = calendar.get(Calendar.DATE)
+
             // 다이얼로그: 시작 날짜 버튼
-            var sYear = 0
-            var sMonth = 0
-            var sDay = 0
+            var sYear = nYear
+            var sMonth = nMonth
+            var sDay = nDay
 
             val pickStartDate = showingDialog.findViewById<Button>(R.id.dday_dialog_sdBtn)
             pickStartDate?.setOnClickListener {
-                val gCalendar = GregorianCalendar()
-                val nYear = gCalendar.get(Calendar.YEAR)
-                val nMonth = gCalendar.get(Calendar.MONTH)
-                val nDay = gCalendar.get(Calendar.DATE)
-
                 val startDatePick = DatePickerDialog(this, object : OnDateSetListener{
                     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
                         cdStartDateText?.setText("시작: ${year}년 ${month + 1}월 ${dayOfMonth}일")
@@ -179,17 +183,12 @@ class MainActivity : AppCompatActivity() {
             }
 
             // 다이얼로그: 종료 날짜 버튼
-            var eYear = 0
-            var eMonth = 0
-            var eDay = 0
+            var eYear = nYear
+            var eMonth = nMonth
+            var eDay = nDay
 
             val pickEndDate = showingDialog.findViewById<Button>(R.id.dday_dialog_edBtn)
             pickEndDate?.setOnClickListener {
-                val gCalendar = GregorianCalendar()
-                val nYear = gCalendar.get(Calendar.YEAR)
-                val nMonth = gCalendar.get(Calendar.MONTH)
-                val nDay = gCalendar.get(Calendar.DATE)
-
                 val endDatePick = DatePickerDialog(this, object : OnDateSetListener{
                     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
                         cdEndDateText?.setText("종료: ${year}년 ${month + 1}월 ${dayOfMonth}일")

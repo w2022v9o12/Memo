@@ -18,6 +18,16 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/dismiss"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:gravity="center"
+        android:text="×"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
         android:id="@+id/memo_click_content"
         android:layout_width="match_parent"
         android:layout_height="315dp"

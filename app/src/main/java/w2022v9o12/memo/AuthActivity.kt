@@ -122,6 +122,7 @@ class AuthActivity : AppCompatActivity() {
             confirmButton?.setOnClickListener {
                 val email = showingDialog.findViewById<EditText>(R.id.signUp_dialog_email_editText)?.text.toString()
                 val password = showingDialog.findViewById<EditText>(R.id.signUp_dialog_password_editText)?.text.toString()
+                val passwordCheck = showingDialog.findViewById<EditText>(R.id.password_check)?.text.toString()
 
                 var allRight = true    // 입력한 이메일, 비밀번호 검사 결과
                 if(email.isEmpty()) {
@@ -178,6 +179,19 @@ class AuthActivity : AppCompatActivity() {
                     allRight = false
                 }
 
+                // 비밀번호를 정확히 입력했는지 확인
+                if(passwordCheck.isEmpty()) {
+                    Toast.makeText(this, "\"비밀번호 확인\"도 입력해 주세요.", Toast.LENGTH_SHORT).show()
+
+                    allRight = false
+                } else {
+                    if(passwordCheck != password) {
+                        Toast.makeText(this, "비밀번호가 서로 다릅니다.", Toast.LENGTH_SHORT).show()
+
+                        allRight = false
+                    }
+                }
+
                 // 회원가입 시도
                 if(allRight) {
                     auth.createUserWithEmailAndPassword(email, password)
@@ -196,6 +210,10 @@ class AuthActivity : AppCompatActivity() {
                         }
                 }
             }
+
+            // 회원가입 다이얼로그: 취소 버튼
+            val cancelBtn = showingDialog.findViewById<Button>(R.id.cancel_button)
+            cancelBtn?.setOnClickListener { showingDialog.dismiss() }
         }
     }
 
